@@ -1,6 +1,7 @@
 import random
-from classes import consumer
-from classes import producer
+import numpy as np
+from utilities.classes import consumer
+from utilities.classes import producer
 def generateConsumers(number):
     """
     Method to generate a number of consumers for the simulation
@@ -10,7 +11,7 @@ def generateConsumers(number):
     consumers = [None for i in range(number)]
     for i in range(number):
         consumers[i] = consumer(generatePrice())
-    return consumers
+    return np.array(consumers)
 
 def generateProducers(number):
     """
@@ -21,7 +22,7 @@ def generateProducers(number):
     producers = [None for i in range(number)]
     for i in range(number):
         producers[i] = producer(generatePrice())
-    return []
+    return np.array(producers)
 
 def generatePrice():
     return random.randrange(1,100)

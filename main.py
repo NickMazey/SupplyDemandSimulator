@@ -1,4 +1,6 @@
 import utilities.generator as generator
+import random
+import numpy as np
 
 
 def main():
@@ -7,50 +9,44 @@ def main():
 
     #Maximum number of epochs
     numEpochs = 10000
-    averagePrice = []
-    numSold = []
+
+    epoch_quantity_demanded = np.array([0 for i in range(numEpochs)])
+    epoch_quantity_supplied = np.array([0 for i in range(numEpochs)])
 
     for i in range(numEpochs):
+        marketPrice = random.randrange(1,100)
         #Consumers purchasing goods
         for con in consumers:
-            for prod in producers:
-                if not prod.sold:
-                    if prod.price <= con.price:
-                        con.bought = True
-                        prod.sold = True
-                        break
+             if con.price < marketPrice:
+                for prod in producers:
+                    if not prod.sold:
+                        if prod.price <= con.price:
+                            con.bought = True
+                            prod.sold = True
+                            break
+        quantity_demanded = 0
+        for con in consumers:
+            if con.price <= marketPrice:
+                quantity_demanded += 1
 
-        numberSold = 0
+        quantity_supplied = 0
         for prod in producers:
-            if prod.sold:
-                numberSold += 1
-        numSold.append(numberSold)
+            if prod.price >= marketPrice:
+                quantity_supplied += 1
 
-        totalRevenue = 0
-        for prod in producers:
-            totalRevenue += prod.price
-        averagePrice.append(totalRevenue / len(producers))
+        if quantity_demanded > quantity_supplied:
+            marketPrice += 0.1
+        elif quantity_demanded < quantity_supplied:
+            marketPrice -= 0.1
 
-        if(numSold == len(producers)):
-            break
-        #Producers adjusting price based on sales
-        for prod in producers:
-            if not prod.sold:
-                prod.price -= 0.1
-            else:
-                prod.price += 0.1
+        np.put(epoch_quantity_demanded,i,quantity_demanded)
+        np.put(epoch_quantity_supplied,i,quantity_supplied)
+
         #Reset status
         for prod in producers:
             prod.sold = False
         for con in consumers:
             con.bought = False
-    bestEpoch = 0
-    mostSold = 0
-    for epoch in range(len(numSold)):
-        if numSold[epoch] > mostSold:
-            bestEpoch = epoch
-            mostSold = numSold[epoch]
-    print("The best epoch was {} where {} were sold for an average price of {}".format(bestEpoch,numSold[bestEpoch],averagePrice[bestEpoch]))
 
 
 
